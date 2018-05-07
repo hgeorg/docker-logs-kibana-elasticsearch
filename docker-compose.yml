@@ -11,11 +11,12 @@ services:
        gelf-address: udp://localhost:12201
 
   elasticsearch:
-    image: elasticsearch:2.0
-    command: elasticsearch -Des.network.host=0.0.0.0
+    image: elasticsearch
+    ports:
+      - "9200:9200"
 
   logstash:
-    image: logstash:2.0
+    image: logstash:5.6.9
     command: logstash -f /etc/logstash/conf.d/logstash.conf
     ports:
         - "12201:12201/udp"
@@ -25,11 +26,13 @@ services:
         - elasticsearch
 
   kibana:
-    image: kibana:4.2
-    links:
+    image: kibana:5.6.9
+    depends_on:
       - elasticsearch
     ports:
       - "5601:5601"  
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
 
 
   
